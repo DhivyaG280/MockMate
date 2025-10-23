@@ -90,13 +90,3 @@ python app.py
 * Real-time mock interviewer avatar using 3D animation
 * Multi-language support
 
-## License
-
-This project is licensed under the MIT License.
-
-## Contact
-
-For support or contributions:
-
-* Email: [support@mockmate.ai](mailto:support@mockmate.ai)
-* GitHub: [https://github.com/your-repo/MockMate](https://github.com/your-repo/MockMate)
