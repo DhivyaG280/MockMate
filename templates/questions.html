@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Chat — {{ role }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f7f9fb; margin:0; padding:0; }
+    header { padding:10px; background:#007bff; color:white; text-align:center; }
+    #container { max-width:900px; margin:20px auto; padding:20px; background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    #controls button { margin:5px; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;}
+    #controls button.primary{background:#007bff; color:#fff;}
+    #status { margin:10px 0; color:#555; }
+    #chat { border:1px solid #ddd; height:300px; overflow-y:auto; padding:10px; border-radius:5px; margin-bottom:10px; background:#f9f9f9; }
+    .message { margin-bottom:10px; }
+    .system { color:#555; font-style:italic; }
+    .user { color:#007bff; font-weight:bold; }
+    #rolesList { display:none; margin:10px 0; border:1px solid #ccc; border-radius:5px; padding:10px; background:#f1f1f1; }
+    #rolesList.active { display:block; }
+    .role-item { padding:5px; cursor:pointer; border-bottom:1px solid #ddd; }
+    .role-item:hover { background:#eee; }
+    #webcamContainer { position:relative; width:320px; height:240px; margin:10px 0; }
+    #webcam { width:100%; height:100%; border:1px solid #ccc; border-radius:5px; object-fit:cover; }
+    #overlay { position:absolute; top:5px; left:5px; background:rgba(0,0,0,0.5); color:white; padding:2px 5px; border-radius:3px; font-size:14px;}
+    audio { display:block; margin-top:10px; }
+    #confidenceDisplay { margin:10px 0; font-weight:bold; }
+  </style>
+</head>
+<body>
+<header>
+  <h2>Interview Chat — {{ role }}</h2>
+</header>
+
+<div id="container">
+  <div id="controls">
+    <button id="btnRole" class="primary">Job Role</button>
+    <button id="btnHR">HR</button>
+    <button id="btnOther">Other Roles</button>
+    <button id="startBtn" disabled>Start Interview</button>
+    <button id="recordBtn" disabled>Record Answer</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <button id="repeatBtn" disabled>Repeat Question</button>
+    <button id="skipBtn" disabled>Skip</button>
+    <button id="refreshBtn">Refresh</button>
+  </div>
+
+  <div id="status">Status: Idle</div>
+  <div id="rolesList"></div>
+  <div id="chat"></div>
+
+  <div id="confidenceDisplay">
+    Audio Confidence: <span id="conf_score">0.0</span> |
+    Emotion: <span id="emotion_label">unknown</span> (<span id="emotion_score">0.0</span>)
+  </div>
+
+  <div id="webcamContainer">
+    <video id="webcam" autoplay muted playsinline></video>
+    <div id="overlay">Webcam inactive</div>
+  </div>
+
+  <audio id="lastPlayback" controls style="display:none;"></audio>
+</div>
+
+<script>
+/** ---------- Globals ---------- */
+let questionsQueue=[], qIndex=-1;
+let recording=false, wavBuffer=[], wavSampleRate=44100;
+let mediaStream=null, sourceNode=null, scriptNode=null, audioContext=null;
+let confidenceInterval=null;
+
+const chatEl = document.getElementById('chat');
+const statusEl = document.getElementById('status');
+const startBtn = document.getElementById('startBtn');
+const recordBtn = document.getElementById('recordBtn');
+const stopBtn = document.getElementById('stopBtn');
+const repeatBtn = document.getElementById('repeatBtn');
+const skipBtn = document.getElementById('skipBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const btnRole = document.getElementById('btnRole');
+const btnHR = document.getElementById('btnHR');
+const btnOther = document.getElementById('btnOther');
+const rolesListEl = document.getElementById('rolesList');
+const webcamEl = document.getElementById('webcam');
+const overlayEl = document.getElementById('overlay');
+const lastPlayback = document.getElementById('lastPlayback');
+
+const confScoreEl = document.getElementById('conf_score');
+const emotionLabelEl = document.getElementById('emotion_label');
+const emotionScoreEl = document.getElementById('emotion_score');
+
+/** ---------- Helper Functions ---------- */
+function appendSystem(msg){ chatEl.innerHTML += `<div class="message system">${msg}</div>`; chatEl.scrollTop = chatEl.scrollHeight; }
+function appendSystemHTML(msg){ chatEl.innerHTML += `<div class="message system">${msg}</div>`; chatEl.scrollTop = chatEl.scrollHeight; }
+function speak(text){ if('speechSynthesis' in window){ const u=new SpeechSynthesisUtterance(text); window.speechSynthesis.speak(u); } }
+function setStatus(text){ statusEl.textContent = "Status: "+text; }
+function enable(el, flag){ el.disabled = !flag; }
+
+/** ---------- Fetch Questions ---------- */
+async function fetchQuestions(category, roleName=null){
+    try {
+        setStatus("Fetching questions...");
+        enable(startBtn,false); enable(recordBtn,false); enable(stopBtn,false);
+        enable(repeatBtn,false); enable(skipBtn,false);
+
+        const resp = await fetch("{{ url_for('get_questions') }}", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({category:category, role:roleName})
+        });
+        const data = await resp.json();
+
+        if(data.questions){
+            questionsQueue = data.questions; qIndex=-1;
+            appendSystem(`✅ Loaded questions for <strong>${data.label}</strong>. Press Start to begin.`);
+            enable(startBtn,true);
+        }
+        else if(category==='other' && roleName===null && data.other_roles){
+            rolesListEl.innerHTML = "";
+            data.other_roles.forEach(r=>{
+                const el = document.createElement('div');
+                el.className = "role-item"; el.textContent = r.role;
+                el.onclick = ()=>{ rolesListEl.classList.remove('active'); fetchQuestions('other', r.role); };
+                rolesListEl.appendChild(el);
+            });
+            rolesListEl.classList.add('active');
+            appendSystem("Select a role from Other Roles to load questions.");
+        }
+        else { appendSystem("⚠️ Failed to fetch questions."); }
+
+    } catch(e){ console.error(e); appendSystem("⚠️ Error fetching questions."); }
+}
+
+/** ---------- Interview Flow ---------- */
+function nextQuestion() {
+    qIndex++;
+    if (qIndex >= questionsQueue.length) {
+        appendSystem("🎉 Interview completed!");
+        setStatus("Finished");
+        enable(recordBtn, false);
+        enable(stopBtn, false);
+        enable(repeatBtn, false);
+        enable(skipBtn, false);
+
+        // --- Submit score to backend and redirect ---
+        const avg_conf = parseFloat(confScoreEl.innerText) || 0;
+        const avg_emotion = parseFloat(emotionScoreEl.innerText) || 0;
+
+        fetch("{{ url_for('submit_score') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ avg_conf, avg_emotion })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                console.error("Failed to submit interview score:", data.message);
+                appendSystem("⚠️ Could not save interview score. Please try again.");
+            }
+        })
+        .catch(err => {
+            console.error("Error submitting interview score:", err);
+            appendSystem("⚠️ Could not save interview score. Please try again.");
+        });
+
+        return;
+    }
+
+    const q = questionsQueue[qIndex];
+    appendSystemHTML(`<strong>Q${qIndex + 1}:</strong> ${q.question} <br/><a href="${q.link}" target="_blank">Resource</a>`);
+    speak(q.question);
+    setStatus(`Question ${qIndex + 1} of ${questionsQueue.length}`);
+    enable(recordBtn, true);
+    enable(stopBtn, false);
+    enable(repeatBtn, true);
+    enable(skipBtn, true);
+}
+
+/** ---------- Recording ---------- */
+async function startRecording(){
+    if(recording) return;
+    if(!audioContext) audioContext = new (window.AudioContext||window.webkitAudioContext)();
+    wavBuffer = [];
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    sourceNode = audioContext.createMediaStreamSource(mediaStream);
+    scriptNode = audioContext.createScriptProcessor(4096,1,1);
+    sourceNode.connect(scriptNode); scriptNode.connect(audioContext.destination);
+    scriptNode.onaudioprocess = e=>{
+        if(!recording) return;
+        const input = e.inputBuffer.getChannelData(0);
+        wavBuffer.push(new Float32Array(input));
+    };
+    recording=true;
+    enable(recordBtn,false); enable(stopBtn,true);
+    setStatus("Recording...");
+
+    confidenceInterval = setInterval(()=>{
+        const randomConfidence = (Math.random()*(1.0-0.4)+0.4).toFixed(2);
+        const emotions=["happy","sad","neutral","angry","surprised"];
+        const randomEmotion = emotions[Math.floor(Math.random()*emotions.length)];
+        const randomEmotionScore = (Math.random()*(1.0-0.4)+0.4).toFixed(2);
+
+        confScoreEl.innerText = randomConfidence;
+        emotionLabelEl.innerText = randomEmotion;
+        emotionScoreEl.innerText = randomEmotionScore;
+    }, 1000);
+}
+
+async function stopRecording(){
+    if(!recording) return;
+    recording=false;
+    scriptNode.disconnect(); sourceNode.disconnect(); mediaStream.getTracks().forEach(t=>t.stop());
+    enable(recordBtn,true); enable(stopBtn,false);
+
+    clearInterval(confidenceInterval);
+
+    const wavBlob = encodeWAV(wavBuffer, wavSampleRate);
+    setStatus("Answer recorded.");
+    lastPlayback.style.display="block"; lastPlayback.src = URL.createObjectURL(wavBlob);
+
+    nextQuestion();
+}
+
+/** ---------- WAV Encoding ---------- */
+function encodeWAV(buffers, sampleRate){
+    const flatten = Float32Array.from(buffers.flat());
+    const buffer = new ArrayBuffer(44 + flatten.length*2);
+    const view = new DataView(buffer);
+    function writeString(view, offset, str){ for(let i=0;i<str.length;i++) view.setUint8(offset+i,str.charCodeAt(i)); }
+    writeString(view,0,"RIFF"); view.setUint32(4,36+flatten.length*2,true);
+    writeString(view,8,"WAVE"); writeString(view,12,"fmt "); view.setUint32(16,16,true);
+    view.setUint16(20,1,true); view.setUint16(22,1,true); view.setUint32(24,sampleRate,true);
+    view.setUint32(28,sampleRate*2,true); view.setUint16(32,2,true); view.setUint16(34,16,true);
+    writeString(view,36,"data"); view.setUint32(40,flatten.length*2,true);
+    let offset=44;
+    for(let i=0;i<flatten.length;i++){
+        let s=Math.max(-1,Math.min(1,flatten[i]));
+        view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true); offset+=2;
+    }
+    return new Blob([view],{type:"audio/wav"});
+}
+
+/** ---------- Events ---------- */
+btnRole.onclick=()=>{ btnRole.classList.add('primary'); btnHR.classList.remove('primary'); btnOther.classList.remove('primary'); fetchQuestions('job_role'); };
+btnHR.onclick=()=>{ btnHR.classList.add('primary'); btnRole.classList.remove('primary'); btnOther.classList.remove('primary'); fetchQuestions('hr'); };
+btnOther.onclick=()=>{ btnOther.classList.add('primary'); btnRole.classList.remove('primary'); btnHR.classList.remove('primary'); rolesListEl.classList.toggle('active'); fetchQuestions('other'); };
+startBtn.onclick=()=>{ nextQuestion(); enable(startBtn,false); };
+recordBtn.onclick=startRecording;
+stopBtn.onclick=stopRecording;
+repeatBtn.onclick=()=>{ if(qIndex>=0) speak(questionsQueue[qIndex].question); };
+skipBtn.onclick=nextQuestion;
+refreshBtn.onclick=()=>{ location.reload(); };
+
+/** ---------- Webcam Emotion Tracking ---------- */
+async function initWebcam(){
+    try{
+        const stream = await navigator.mediaDevices.getUserMedia({video:{width:160,height:120}, audio:false});
+        webcamEl.srcObject = stream;
+        overlayEl.textContent = "Tracking...";
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        setInterval(async()=>{
+            if(!webcamEl.videoWidth) return;
+            canvas.width = webcamEl.videoWidth; canvas.height = webcamEl.videoHeight;
+            ctx.drawImage(webcamEl,0,0,canvas.width,canvas.height);
+            const dataURL = canvas.toDataURL('image/jpeg',0.6);
+            try{
+                const resp = await fetch("{{ url_for('track_emotion') }}",{
+                    method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({frame:dataURL, ts:Date.now()})
+                });
+                const data = await resp.json();
+                overlayEl.textContent = `${data.emotion} (${data.score})`;
+            } catch(e){ overlayEl.textContent="Error"; }
+        },1000);
+    } catch(e){ overlayEl.textContent="Webcam access denied"; console.error(e); }
+}
+initWebcam();
+</script>
+</body>
+</html>
