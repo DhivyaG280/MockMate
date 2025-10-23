@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ category }} Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 15px;
+            min-height: 100vh;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        form {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .question p {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ category }} Aptitude Test</h2>
+    <form method="POST">
+        {% for q in questions %}
+            <div class="question">
+                <p>{{ loop.index }}. {{ q.question }}</p>
+                <input type="radio" name="{{ q.id }}" value="A" required> {{ q.option_a }} <br>
+                <input type="radio" name="{{ q.id }}" value="B" required> {{ q.option_b }} <br>
+                <input type="radio" name="{{ q.id }}" value="C" required> {{ q.option_c }} <br>
+                <input type="radio" name="{{ q.id }}" value="D" required> {{ q.option_d }} <br>
+            </div>
+        {% endfor %}
+        <button type="submit">Submit Answers</button>
+    </form>
+</body>
+</html>
