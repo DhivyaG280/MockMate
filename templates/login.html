@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MockMate - An Interview Practice Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            width: 320px;
+            text-align: center;
+        }
+        h1 {
+            color: #2575fc;
+            margin-bottom: 10px;
+        }
+        img.logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #2575fc;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1b5bbf;
+        }
+        a {
+            text-decoration: none;
+            color: #2575fc;
+            display: block;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        <img src="static/robot.png" alt="Robot Logo" class="logo">
+        <h1>MockMate</h1>
+        <p>An Interview Practice Platform</p>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+        <a href="/register">Don't have an account? Register</a>
+    </form>
+</body>
+</html>
