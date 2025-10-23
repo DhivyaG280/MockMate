@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Resume</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            color: #ff5e62;
+        }
+        input[type="file"] {
+            margin: 15px 0;
+        }
+        button {
+            background-color: #ff5e62;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #e94e4f;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data">
+        <h2>Upload Your Resume</h2>
+        <input type="file" name="resume" required>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
