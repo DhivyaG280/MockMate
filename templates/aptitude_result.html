@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Result</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 30px; background-color: #f8f9fa; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { color: #007bff; margin-bottom: 20px; text-align: center; }
+        .question { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        .question p { margin: 5px 0; }
+        .correct { color: green; font-weight: bold; }
+        .wrong { color: red; font-weight: bold; }
+        a.button { display: inline-block; margin: 15px 10px; padding: 12px 25px; border-radius: 6px; border: 2px solid #007bff; color: #007bff; font-weight: 600; text-decoration: none; transition: 0.3s; }
+        a.button:hover { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Aptitude Test Result</h2>
+        <p><strong>Total Questions:</strong> {{ total }}</p>
+        <p><strong>Correct Answers:</strong> {{ correct }}</p>
+        <p><strong>Score:</strong> {{ score }}%</p>
+
+        {% for r in results %}
+            <div class="question">
+                <p><strong>Q{{ loop.index }}:</strong> {{ r.question }}</p>
+                <p>A: {{ r.options.A }}</p>
+                <p>B: {{ r.options.B }}</p>
+                <p>C: {{ r.options.C }}</p>
+                <p>D: {{ r.options.D }}</p>
+                <p>Your Answer:
+                    <span class="{{ 'correct' if r.is_correct else 'wrong' }}">
+                        {{ r.selected }}
+                    </span>
+                </p>
+                {% if not r.is_correct %}
+                <p>Correct Answer: <span class="correct">{{ r.correct }}</span></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <a href="{{ url_for('aptitude_category') }}" class="button">Back to Category Selection</a>
+        <a href="{{ url_for('questions') }}" class="button">Go to Interview Questions</a>
+    </div>
+</body>
+</html>
