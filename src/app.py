@@ -74,23 +74,61 @@ except Exception as e:
     tokenizer = None
     hf_model = None
     id2label = {}
+import os
+import requests
+import logging
+
+log = logging.getLogger(__name__)
+
 GOOGLE_GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
-GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+
+GEMINI_ENDPOINT = (
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+)
+
 def call_gemini(prompt_text, timeout=15):
     if not GOOGLE_GEMINI_API_KEY:
-        log.warning("Gemini API key not set - returning None")
+        log.warning("Gemini API key not set")
         return None
-    headers = {"Content-Type": "application/json", "X-goog-api-key": GOOGLE_GEMINI_API_KEY}
-    json_data = {"contents": [{"parts": [{"text": prompt_text}]}]}
+
+    params = {
+        "key": GOOGLE_GEMINI_API_KEY
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt_text}
+                ]
+            }
+        ]
+    }
+
     try:
-        resp = requests.post(GEMINI_ENDPOINT, headers=headers, json=json_data, timeout=timeout)
+        resp = requests.post(
+            GEMINI_ENDPOINT,
+            params=params,
+            headers=headers,
+            json=payload,
+            timeout=timeout
+        )
+
         resp.raise_for_status()
         data = resp.json()
-        text = data['candidates'][0]['content']['parts'][0]['text'].strip()
-        return text
+
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+
     except Exception as e:
         log.exception("Gemini call failed: %s", e)
         return None
+
+
+
 def clean_question_text(q):
     return re.sub(r'^\s*\d+[\.\)\-\s]*', '', q).strip()
 def parse_questions_with_links(gemini_text, expected=5):
