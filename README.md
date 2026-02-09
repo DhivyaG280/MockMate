@@ -153,7 +153,7 @@ python app.py
 
 ### 🔐 User Login & Dashboard
 
-![User Login and Dashboard](images/Login page.png)
+![User Login and Dashboard](images/Login%20page.png)
 *Figure 1: Secure login page and user dashboard showing interview history.*
 
 ### 📄 Resume Upload & Skill Extraction
