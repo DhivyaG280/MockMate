@@ -171,7 +171,7 @@ python app.py
 
 ### 📊 Performance Report & Feedback
 
-![Performance Report](images/Interview%20questions.png)
+![Performance Report](images/Interview%20scores.png)
 
 *Figure 4: Detailed performance report including scores, strengths, weaknesses, and improvement suggestions.*
 
