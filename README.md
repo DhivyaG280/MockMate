@@ -160,6 +160,7 @@ python app.py
 ### 📄 Resume Upload & Skill Extraction
 
 ![Resume Parsing Output](images/Job%20role%20prediction.png)
+
 *Figure 2: Resume upload interface with extracted skills and role relevance score.*
 
 ### ❓ AI-Generated Interview Questions
