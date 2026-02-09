@@ -169,22 +169,11 @@ python app.py
 
 *Figure 3: Dynamically generated interview questions based on selected job role.*
 
-### 🎤 Voice-Based Interview Simulation
-
-![Voice Interview](images/voice_interview.png)
-*Figure 4: Real-time voice-based interview interaction with speech-to-text output.*
-
-### 🎭 Emotion & Confidence Detection
-
-![Emotion Detection](images/emotion_detection.png)
-*Figure 5: Facial emotion recognition and confidence level analysis during interview.*
-
 ### 📊 Performance Report & Feedback
 
-![Performance Report](images/performance_report.png)
-*Figure 6: Detailed performance report including scores, strengths, weaknesses, and improvement suggestions.*
+![Performance Report](images/Interview%20questions.png)
 
-> 📌 **Note:** The above images are sample outputs. Actual results may vary depending on user input, environment, and model performance.
+*Figure 4: Detailed performance report including scores, strengths, weaknesses, and improvement suggestions.*
 
 ---
 
