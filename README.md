@@ -164,7 +164,8 @@ python app.py
 
 ### ❓ AI-Generated Interview Questions
 
-![Question Generation](images/question_generation.png)
+![Question Generation](images/Interview%20questions.png)
+
 *Figure 3: Dynamically generated interview questions based on selected job role.*
 
 ### 🎤 Voice-Based Interview Simulation
