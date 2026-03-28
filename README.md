@@ -2,102 +2,105 @@
 
 ## 📌 Overview
 
-MockMate is an AI-powered mock interview preparation platform designed to simulate real-world interview environments. It helps candidates enhance their communication skills, technical knowledge, emotional intelligence, and confidence through intelligent resume parsing, adaptive question generation, emotion analysis, and detailed performance feedback.
+MockMate is an AI-driven mock interview preparation platform designed to simulate real-world interview environments and provide intelligent, personalized feedback to candidates.
 
-MockMate acts as a virtual interviewer, enabling users to practice interviews anytime with AI-driven evaluation and personalized improvement recommendations.
+In today’s competitive job market, candidates often struggle with communication, confidence, and role-specific preparation. Traditional methods lack personalization and real-time evaluation. MockMate addresses these challenges using Artificial Intelligence, Natural Language Processing (NLP), and Deep Learning techniques to deliver an adaptive and realistic interview experience.
+
+The system analyzes resumes, generates role-specific questions, evaluates verbal and non-verbal responses, and provides actionable feedback to improve candidate performance.
 
 ---
 
 ## 🚀 Key Features
 
-* AI-driven interview question generation based on job role and resume content
-* Resume parsing and skill extraction using NLP techniques
-* Voice-based interview simulation with speech-to-text conversion
-* Facial emotion and speech-based confidence analysis
-* Dynamic performance scoring system
-* Personalized feedback and improvement recommendations
+- AI-driven interview question generation based on resume and job role  
+- NLP-based resume parsing and skill extraction  
+- Multimodal interview analysis (text, voice, and facial expressions)  
+- Facial emotion detection using CNN  
+- Speech confidence evaluation using RNN  
+- ATS-based resume scoring and optimization suggestions  
+- AI-powered aptitude test with proctoring system  
+- Dynamic performance scoring and detailed feedback reports  
+- Personalized improvement recommendations  
+- Job role prediction and career guidance  
 
 ---
 
 ## 🧠 System Architecture
 
-1. User Authentication & Profile Management
-2. Resume Upload & NLP-Based Parsing Module
-3. Dynamic Question Generation Engine
-4. Interview Simulation Interface (Audio / Video)
-5. Analysis Module
+MockMate follows a modular architecture consisting of:
 
-   * Facial Emotion Detection
-   * Speech Confidence Estimation
-   * NLP-Based Answer Matching
-6. Performance Evaluation & Report Generation
+1. User Authentication & Profile Management  
+2. Resume Upload & NLP-Based Parsing Module  
+3. ATS Evaluation Engine  
+4. Dynamic Question Generation Engine  
+5. Interview Simulation Interface (Audio/Video)  
+6. Multimodal Analysis Module  
+   - Facial Emotion Detection (CNN)  
+   - Speech Confidence Analysis (RNN)  
+   - NLP-Based Answer Evaluation  
+7. Aptitude Test Module with AI Proctoring  
+   - Face detection  
+   - Multiple person detection  
+   - Head movement tracking  
+8. Performance Evaluation & Report Generation  
+9. Feedback & Recommendation Engine  
 
 ---
 
 ## 🛠 Technologies Used
 
 ### Frontend
-
-* HTML
-* CSS
-* JavaScript
-* React (optional for enhanced UI)
+- HTML  
+- CSS  
+- JavaScript  
+- React (optional)  
 
 ### Backend
-
-* Python (Flask / Django)
+- Python (Flask / Django)  
 
 ### AI & Machine Learning
-
-* CNN – Facial emotion recognition
-* DNN – Speech confidence analysis
-* Transformers (BERT / DistilBERT) – Resume parsing and answer evaluation
+- CNN – Facial Emotion Recognition  
+- RNN (LSTM) – Speech Confidence Analysis  
+- Transformers (BERT / DistilBERT) – Resume Parsing & Answer Evaluation  
 
 ### Database
-
-* PostgreSQL / MySQL
+- MySQL / PostgreSQL  
 
 ### APIs & Libraries
-
-* Speech Recognition API (Google Speech / OpenAI Whisper)
-* Text-to-Speech (TTS) API
-* OpenCV
-* MediaPipe
-* HuggingFace Transformers
+- Speech Recognition (Google Speech / Whisper)  
+- Text-to-Speech (TTS)  
+- OpenCV  
+- MediaPipe  
+- Hugging Face Transformers  
 
 ---
 
 ## 📂 Datasets Used
 
-### 1️⃣ Resume Parsing & Skill Extraction
+### Resume Parsing & Skill Extraction
+- Resume Dataset (Kaggle)  
+- Indeed Job Descriptions Dataset  
+- O*NET / ESCO Skills Dataset  
 
-* Resume Dataset (Kaggle)
-* Indeed Job Descriptions Dataset
-* O*NET / ESCO Open Skills Dataset
+### Interview Question Generation
+- Kaggle Interview Questions Dataset  
+- Glassdoor Dataset  
+- Custom Question Bank  
 
-### 2️⃣ Interview Question Generation
+### Emotion Detection
+- FER-2013  
+- CK+ Dataset  
+- RAF-DB  
 
-* Interview Questions Dataset (Kaggle)
-* Glassdoor Interview Questions Dataset
-* Custom Curated Interview Question Bank
+### Speech & Confidence Analysis
+- RAVDESS Dataset  
+- CREMA-D Dataset  
+- LibriSpeech  
 
-### 3️⃣ Emotion Detection
-
-* FER-2013 Dataset
-* CK+ (Cohn-Kanade Expression Dataset)
-* RAF-DB (Real-world Affective Faces Database)
-
-### 4️⃣ Speech & Confidence Analysis
-
-* RAVDESS (Ryerson Audio-Visual Database of Emotional Speech and Song)
-* CREMA-D (Crowd-Sourced Emotional Multimodal Actors Dataset)
-* LibriSpeech Dataset
-
-### 5️⃣ NLP Answer Evaluation
-
-* SQuAD Dataset
-* STS Benchmark (Semantic Textual Similarity Dataset)
-* Custom Interview Answer Corpus
+### NLP Answer Evaluation
+- SQuAD Dataset  
+- STS Benchmark  
+- Custom Answer Corpus  
 
 ---
 
@@ -110,100 +113,10 @@ cd MockMate
 
 # Create virtual environment
 python -m venv env
-source env/bin/activate   # On Windows: env\Scripts\activate
+source env/bin/activate   # Windows: env\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Run the application
 python app.py
-```
-
----
-
-## 🔄 How It Works
-
-### 1. Upload Resume
-
-* The system extracts skills, experience, and keywords using NLP models.
-
-### 2. Select Job Role
-
-* Resume data is mapped against role-specific requirements.
-
-### 3. Start Mock Interview
-
-* AI dynamically generates and asks interview questions via voice.
-
-### 4. Analyze Responses
-
-* Speech relevance and fluency analysis
-* Facial expression and emotional stability detection
-* Confidence evaluation based on tone, pitch, and pauses
-
-### 5. Generate Performance Report
-
-* Overall performance score
-* Identified strengths and weaknesses
-* Personalized improvement suggestions
-
----
-
-## 🖼️ Output Screens / Results
-
-### 🔐 User Login & Dashboard
-
-![User Login and Dashboard](images/Login%20page.png)
-
-*Figure 1: Secure login page and user dashboard showing interview history.*
-
-### 📄 Resume Upload & Skill Extraction
-
-![Resume Parsing Output](images/Job%20role%20prediction.png)
-
-*Figure 2: Resume upload interface with extracted skills and role relevance score.*
-
-### ❓ AI-Generated Interview Questions
-
-![Question Generation](images/Interview%20questions.png)
-
-*Figure 3: Dynamically generated interview questions based on selected job role.*
-
-### 📊 Performance Report & Feedback
-
-![Performance Report](images/Interview%20scores.png)
-
-*Figure 4: Detailed performance report including scores, strengths, weaknesses, and improvement suggestions.*
-
----
-
-## 🧩 Core Modules
-
-### 📄 Resume Parser
-
-* Keyword extraction
-* Skill and experience identification
-* Role relevance analysis
-
-### ❓ Question Generator
-
-* Transformer-based models
-* Real-time difficulty adjustment
-
-### 🎭 Emotion & Confidence Analyzer
-
-* CNN-based facial emotion recognition
-* Speech modulation analysis (pitch, speed, hesitation)
-
-### 📊 Feedback & Evaluation Engine
-
-* Multi-parameter scoring system
-* Personalized improvement recommendations
-
----
-
-## 🎯 Use Cases
-
-* Job seekers preparing for technical and HR interviews
-* College placement training and assessment
-* Corporate candidate readiness evaluation
